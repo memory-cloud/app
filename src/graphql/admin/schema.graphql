@@ -1,0 +1,38 @@
+type Admin {
+    email: String
+}
+
+type Game {
+    appid: String
+    key: String
+    achievements: [Achievement]
+    players: Int
+}
+
+type Achievement {
+    _id: ID
+    title: String
+    description: String
+}
+
+input GameInput {
+    appid: String!
+    key: String!
+}
+
+input AchievementInput {
+    _id: String
+    title: String!
+    description: String!
+}
+
+type Query {
+    me: Admin
+    games: [Game]
+    game(appid: String!): Game
+}
+
+type Mutation {
+    createGame(game: GameInput!): Boolean
+    upsertAchievements(achievements: [AchievementInput!]!, appid: String!): [Achievement]
+}

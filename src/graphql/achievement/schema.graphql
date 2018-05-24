@@ -1,0 +1,13 @@
+type AchievementDone {
+    title: String
+    description: String
+    completed: String
+}
+
+type Query {
+    Achievements: [AchievementDone]
+}
+
+type Mutation {
+    CompleteAchievement(title: String!): Boolean
+}

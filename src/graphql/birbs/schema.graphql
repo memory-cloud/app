@@ -1,0 +1,15 @@
+type ScoreBirb {
+    seed: Float
+    multiplier: Int
+    id: String
+}
+
+type LeaderboardBirb {
+    leaderboard: [ScoreBirb]
+    position: Int
+}
+
+type Query {
+    GetLeaderboardBirb(top: Int = 100): LeaderboardBirb
+    GetLeaderboardBirbFriends(top: Int = 100): LeaderboardBirb
+}
