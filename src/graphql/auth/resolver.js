@@ -8,6 +8,9 @@ exports.resolver = {
 	},
 	Mutation: {
 		async createUser (db, {email, password}) {
+			if(process.env.OPEN === 'false') {
+				return new Error('Registration is closed')
+			}
 			if(await db.model('Admin').findOne({email: email})) {
 				return new Error('Email already in use')
 			}
