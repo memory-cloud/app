@@ -16,7 +16,7 @@ exports.resolver = {
 			return admin
 		},
 		games (db, args, {admin}) {
-			return db.model('Game').find({admin: admin}).select('appid key')
+			return db.model('Game').find({admin: admin}).select('appid key name')
 		},
 		game (db, {appid}, {admin}) {
 			return db.model('Game').findOne({admin: admin, appid: appid})

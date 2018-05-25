@@ -10,6 +10,10 @@ const GameSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	name: {
+		type: String,
+		required: true
+	},
 	admin: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Admin',
