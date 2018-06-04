@@ -6,7 +6,7 @@ exports.resolver = {
 		position ({leaderboard}, params, {user}) {
 			return leaderboard.map((entry) => entry.id).indexOf(user.fbid) + 1
 		},
-		leaderboard ({leaderboard, top}){
+		leaderboard ({leaderboard, top}) {
 			return leaderboard.slice(0, top)
 		}
 	},
@@ -17,10 +17,9 @@ exports.resolver = {
 				{$project: {score: '$floats', id: '$fbid', mult: '$integers'}},
 				{$unwind: '$score'},
 				{$match: {'score._id': 'currentSeed'}},
-				{$project: {'seed': '$score.value', 'id': 1, '_id': 0, mult: 1}},
 				{$unwind: '$mult'},
 				{$match: {'mult._id': 'currentSeedMult'}},
-				{$project: {'seed': 1, 'id': 1, '_id': 0, 'multiplier': '$mult.value'}},
+				{$project: {'seed': '$score.value', 'id': 1, '_id': 0, 'multiplier': '$mult.value'}},
 				{$sort: {'multiplier': -1, 'seed': -1}}
 			]).cache()
 			let response = {}
@@ -31,31 +30,25 @@ exports.resolver = {
 		async GetLeaderboardBirbFriends (db, {top}, {user, token}) {
 			graph.setAccessToken(token)
 			try {
-				var result = await graph.getAsync('me/friends?fields=id')
+				const result = await graph.getAsync('me/friends?fields=id')
+				result.data.push({id: user.fbid})
+				const leaderboard = await db.model('User').aggregate([
+					{$match: {'fbid': {'$in': result.data.map((user) => user.id)}}},
+					{$project: {score: '$floats', id: '$fbid', mult: '$integers'}},
+					{$unwind: '$score'},
+					{$match: {'score._id': 'currentSeed'}},
+					{$unwind: '$mult'},
+					{$match: {'mult._id': 'currentSeedMult'}},
+					{$project: {'seed': '$score.value', 'id': 1, '_id': 0, 'multiplier': '$mult.value'}},
+					{$sort: {'multiplier': -1, 'seed': -1}}
+				])
+				return {
+					leaderboard: leaderboard,
+					top: top < 100 && top > 0 ? top : 100
+				}
 			} catch (err) {
 				return err
 			}
-			result.data.push({id: user.fbid})
-			const friends = await db.model('User').find({fbid: result.data.map(({id})=> id)}).select('integers floats fbid')
-
-			let leaderboard = friends.map((user) => ({
-				id: user.fbid,
-				seed: user.floats.id('currentSeed').value,
-				multiplier: user.integers.id('currentSeedMult').value
-			}))
-
-			const response = {}
-			response.leaderboard = leaderboard.sort((a, b) => {
-				if (a.multiplier < b.multiplier) {
-					return true;
-				} else if (a.multiplier > b.multiplier) {
-					return false;
-				} else {
-					return a.seed < b.seed
-				}
-			})
-			response.top = top < 100 && top > 0 ? top : 100
-			return response
 		}
 	}
 }

@@ -33,23 +33,23 @@ exports.resolver = {
 			graph.setAccessToken(token)
 			try {
 				var result = await graph.getAsync('me/friends?fields=id')
+				result.data.push({id: user.fbid})
+				const leaderboard = await db.model('User').aggregate([
+					{$match: {'fbid': {'$in': result.data.map((user)=>user.id)}}},
+					{$project: {score: '$integers', id: '$fbid'}},
+					{$unwind: '$score'},
+					{$match: {'score._id': key}},
+					{$sort: {'score.value': -1}},
+					{$limit: top},
+					{$project: {'score': '$score.value', 'id': 1, '_id': 0}}
+				])
+				return {
+					leaderboard: leaderboard,
+					top: top < 100 && top > 0 ? top : 100
+				}
 			} catch (err) {
 				return err
 			}
-			result.data.push({id: user.fbid})
-			const teste = await db.model('User').find({fbid: result.data.map(({id})=> id)}).select('integers fbid')
-
-			let leaderboard = teste.map((user) => {
-				let resp = {}
-				resp.id = user.fbid
-				resp.score = user.integers.id(key).value
-				return resp
-			})
-
-			const response = {}
-			response.leaderboard = leaderboard.sort((a, b) => a.score < b.score)
-			response.top = top < 100 && top > 0 ? top : 100
-			return response
 		},
 		async PublicLeaderboard (db, {appid, key, top}) {
 			top = top < 100 && top > 0 ? top : 100
