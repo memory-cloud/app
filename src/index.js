@@ -33,7 +33,7 @@ async function startApp () {
 	)
 
 	// start server
-	app.listen(process.env.PORT, () => console.log('Listening at port', process.env.PORT))
+	app.listen(3000, () => console.log('Listening at port', 3000))
 }
 
 startApp()

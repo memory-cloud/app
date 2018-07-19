@@ -15,7 +15,6 @@ RUN npm run heroku-postbuild
 EXPOSE 3000
 
 ENV MONGODB_URI mongodb://mongo-rs0-1,mongo-rs0-2,mongo-rs0-3/test?replicaSet=rs0
-ENV PORT 3000
 ENV SECRET secret
 ENV REDIS_PORT 6379
 ENV REDIS_HOST cache
