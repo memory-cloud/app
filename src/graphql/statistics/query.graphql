@@ -1,0 +1,8 @@
+type StatsAchievement {
+    achievement: Achievement
+    completed: Int
+}
+
+type Query {
+    achievementsCompleted (id: String!) : [StatsAchievement]
+}

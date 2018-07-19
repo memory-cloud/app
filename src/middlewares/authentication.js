@@ -3,6 +3,8 @@ import GameModel from '@/models/game'
 import AdminModel from '@/models/admin'
 
 import graph from 'fbgraph'
+import dataloaders from  '@/dataloader'
+import Mongoose from 'mongoose'
 
 module.exports = async (req, res, next) => {
 	const appId = req.headers.appid
@@ -15,6 +17,7 @@ module.exports = async (req, res, next) => {
 
 		try {
 			req.context.admin = await AdminModel.findByToken(req.headers.admintoken)
+			req.context.dataloaders = dataloaders(Mongoose)
 			return next()
 		} catch (err) {
 			console.log(err)
@@ -45,6 +48,7 @@ module.exports = async (req, res, next) => {
 		if (!user) return res.sendStatus(500)
 		req.context.user = user
 		req.context.token = credentials
+		req.context.dataloaders = dataloaders(Mongoose)
 
 		next()
 	})

@@ -5,13 +5,9 @@ import cors from 'cors'
 import schema from './schema'
 import context from 'context-middleware'
 import middlewares from '@/middlewares'
-import throng from 'throng'
 import db from '@/config/db'
 
-// variavel usada para determinar quantidade de instancias
-var WORKERS = process.env.WEB_CONCURRENCY || 1
-
-async function startApp() {
+async function startApp () {
 	const app = express()
 
 	// insert context in req
@@ -40,9 +36,4 @@ async function startApp() {
 	app.listen(process.env.PORT, () => console.log('Listening at port', process.env.PORT))
 }
 
-// throng used for scaling when in production
-if (process.env.NODE_ENV === 'production') {
-	throng(WORKERS, startApp)
-} else {
-	startApp()
-}
+startApp()

@@ -1,6 +1,4 @@
 import mongoose from 'mongoose'
-import Promise from 'bluebird'
-const graph = Promise.promisifyAll(require('fbgraph'))
 
 const UserSchema = new mongoose.Schema({
 	fbid: {
