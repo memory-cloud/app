@@ -26,7 +26,7 @@ exports.resolver = {
 		game (db, {appid}, {admin}, info) {
 			check(admin)
 			return db.model('Game').findOne({admin: admin, appid: appid}, graphqlMongodbProjection(info))
-		},
+		}
 
 	},
 	Mutation: {
@@ -45,7 +45,7 @@ exports.resolver = {
 				return err
 			}
 		},
-		async upsertAchievements(db, {achievements, appid}, {admin}, info) {
+		async upsertAchievements (db, {achievements, appid}, {admin}, info) {
 			try {
 				check(admin)
 				var game = await db.model('Game').FindGame(appid, admin)
@@ -53,8 +53,8 @@ exports.resolver = {
 				let newAchievements = achievements.filter(achievement => !achievement._id)
 				let updateAchievements = achievements.filter(achievement => achievement._id)
 
-				if (updateAchievements[0]) { //updateMany
-					updateAchievements.map(async(achievement) => await db.model('Achievement').update({
+				if (updateAchievements[0]) { // updateMany
+					updateAchievements.map(async (achievement) => db.model('Achievement').update({
 						_id: achievement._id,
 						game: game._id
 					}, achievement))
@@ -63,21 +63,20 @@ exports.resolver = {
 				if (!newAchievements[0]) {
 					return db.model('Achievement').find({game: game}, graphqlMongodbProjection(info))
 				}
-				newAchievements.map(async(achievement) => {
+				newAchievements.map(async (achievement) => {
 					achievement.game = game._id
-					achievement._id = mongoose.Types.ObjectId()
+					achievement._id = db.Types.ObjectId()
 					game.achievements.push(achievement._id)
 				})
 
 				await db.model('Achievement').insertMany(newAchievements)
 				await game.save()
 				return db.model('Achievement').find({game: game}, graphqlMongodbProjection(info))
-
 			} catch (err) {
 				return err
 			}
 		},
-		async deleteAchievement(db, {appid, achievementid}, {admin}, info) {
+		async deleteAchievement (db, {appid, achievementid}, {admin}, info) {
 			try {
 				check(admin)
 

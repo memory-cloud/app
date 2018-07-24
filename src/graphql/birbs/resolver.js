@@ -1,6 +1,6 @@
 import Promise from 'bluebird'
-const graph = Promise.promisifyAll(require('fbgraph'))
 import check from '@/util/check'
+const graph = Promise.promisifyAll(require('fbgraph'))
 
 exports.resolver = {
 	LeaderboardBirb: {

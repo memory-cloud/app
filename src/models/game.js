@@ -33,11 +33,10 @@ GameSchema.statics.FindGame = async function (appid, admin) {
 	const game = await mongoose.model('Game').findOne({appid: appid, admin: admin})
 
 	if (!game) {
-		throw new Error("Game not found")
+		throw new Error('Game not found')
 	}
 
 	return game
-
 }
 
 module.exports = mongoose.model('Game', GameSchema)

@@ -4,7 +4,7 @@ import populate from '@/util/populate'
 
 exports.resolver = {
 	Query: {
-		Load(db, params, {user}, info) {
+		Load (db, params, {user}, info) {
 			try {
 				check(user)
 				return db.model('User').findOne({_id: user._id}, graphqlMongodbProjection(info))

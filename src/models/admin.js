@@ -44,7 +44,7 @@ AdminSchema.statics.findByToken = async function (token) {
 	}
 	const admin = await this.findOne({_id: teste._id}, {_id: 1})
 	if (!admin) {
-		return new Error("User not found")
+		return new Error('User not found')
 	}
 	return admin
 }

@@ -1,5 +1,5 @@
 export default (user) => {
-    if (!user) {
-        throw new Error('Permission denied')
-    }
+	if (!user) {
+		throw new Error('Permission denied')
+	}
 }

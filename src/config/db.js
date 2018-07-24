@@ -6,10 +6,10 @@ const options = {
 	reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
 	reconnectInterval: 500, // Reconnect every 500ms
 	poolSize: 40, // Maintain up to 10 socket connections
-	connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
+	connectTimeoutMS: 10000 // Give up initial connection after 10 seconds
 }
 
-function startDB() {
+function startDB () {
 	Mongoose.connect(process.env.MONGODB_URI, options).then(
 		() => {
 			debug()
@@ -17,6 +17,7 @@ function startDB() {
 			setupRedis()
 		},
 		err => {
+			console.log(err)
 			startDB()
 		}
 	)

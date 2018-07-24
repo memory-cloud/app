@@ -1,6 +1,6 @@
 import Promise from 'bluebird'
-const graph = Promise.promisifyAll(require('fbgraph'))
 import check from '@/util/check'
+const graph = Promise.promisifyAll(require('fbgraph'))
 
 exports.resolver = {
 	Query: {
@@ -30,7 +30,7 @@ exports.resolver = {
 				var result = await graph.getAsync('me/friends?fields=id')
 				result.data.push({id: user.fbid})
 				const leaderboard = await db.model('User').aggregate([
-					{$match: {'fbid': {'$in': result.data.map((player)=>player.id)}}},
+					{$match: {'fbid': {'$in': result.data.map((player) => player.id)}}},
 					{$project: {score: '$integers', id: '$fbid'}},
 					{$unwind: '$score'},
 					{$match: {'score._id': key}},
@@ -44,14 +44,14 @@ exports.resolver = {
 				return err
 			}
 		},
-		async LeaderboardMeFriends (db, {key}, {user, token}) {
+		async LeaderboardMeFriends (db, {key, top, page}, {user, token}) {
 			try {
 				check(user)
 				graph.setAccessToken(token)
 				var result = await graph.getAsync('me/friends?fields=id')
 				result.data.push({id: user.fbid})
 				const leaderboard = await db.model('User').aggregate([
-					{$match: {'fbid': {'$in': result.data.map((user)=>user.id)}}},
+					{$match: {'fbid': {'$in': result.data.map((user) => user.id)}}},
 					{$project: {score: '$integers', id: '$fbid'}},
 					{$unwind: '$score'},
 					{$match: {'score._id': key}},
@@ -65,7 +65,7 @@ exports.resolver = {
 				return err
 			}
 		},
-		async LeaderboardMeGlobal (db, {key}, {user}) {
+		async LeaderboardMeGlobal (db, {key, top, page}, {user}) {
 			try {
 				check(user)
 				const leaderboard = await db.model('User').aggregate([
@@ -83,6 +83,6 @@ exports.resolver = {
 			} catch (err) {
 				return err
 			}
-		},
+		}
 	}
 }
