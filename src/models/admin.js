@@ -30,32 +30,6 @@ AdminSchema.pre('save', async function (next) {
 	}
 })
 
-AdminSchema.statics.login = async function (email, password) {
-	let admin = await this.findOne({email: email}).select('password')
-
-	if (!admin) {
-		throw new Error('Email not registered')
-	}
-
-	try {
-		await admin.comparePassword(password)
-		return jwt.sign(admin.toJSON(), process.env.SECRET)
-	} catch (err) {
-		return err
-	}
-}
-
-AdminSchema.methods.changePassword = async function ({oldPassword, newPassword}) {
-	try {
-		await user.comparePassword(oldPassword)
-		this.password = newPassword
-		await this.save()
-		return jwt.sign(this, process.env.SECRET)
-	} catch (err) {
-		return err
-	}
-}
-
 AdminSchema.methods.comparePassword = async function (password) {
 	if (!await bcrypt.compare(password, this.password)) {
 		throw new Error('Wrong password')
@@ -68,7 +42,7 @@ AdminSchema.statics.findByToken = async function (token) {
 	} catch (err) {
 		return err
 	}
-	const admin = await this.findById(teste._id)
+	const admin = await this.findOne({_id: teste._id}, {_id: 1})
 	if (!admin) {
 		return new Error("User not found")
 	}

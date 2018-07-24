@@ -1,5 +1,6 @@
 import Promise from 'bluebird'
 const graph = Promise.promisifyAll(require('fbgraph'))
+import check from '@/util/check'
 
 exports.resolver = {
 	LeaderboardBirb: {
@@ -12,22 +13,28 @@ exports.resolver = {
 	},
 	Query: {
 		async GetLeaderboardBirb (db, {top}, {user}) {
-			const leaderboard = await db.model('User').aggregate([
-				{$match: {'game': user.game}},
-				{$project: {score: '$floats', id: '$fbid', mult: '$integers'}},
-				{$unwind: '$score'},
-				{$match: {'score._id': 'currentSeed'}},
-				{$unwind: '$mult'},
-				{$match: {'mult._id': 'currentSeedMult'}},
-				{$project: {'seed': '$score.value', 'id': 1, '_id': 0, 'multiplier': '$mult.value'}},
-				{$sort: {'multiplier': -1, 'seed': -1}}
-			]).cache()
-			let response = {}
-			response.leaderboard = leaderboard
-			response.top = top < 100 && top > 0 ? top : 100
-			return response
+			try {
+				check(user)
+				const leaderboard = await db.model('User').aggregate([
+					{$match: {'game': user.game}},
+					{$project: {score: '$floats', id: '$fbid', mult: '$integers'}},
+					{$unwind: '$score'},
+					{$match: {'score._id': 'currentSeed'}},
+					{$unwind: '$mult'},
+					{$match: {'mult._id': 'currentSeedMult'}},
+					{$project: {'seed': '$score.value', 'id': 1, '_id': 0, 'multiplier': '$mult.value'}},
+					{$sort: {'multiplier': -1, 'seed': -1}}
+				]).cache()
+				let response = {}
+				response.leaderboard = leaderboard
+				response.top = top < 100 && top > 0 ? top : 100
+				return response
+			} catch (err) {
+				return err
+			}
 		},
 		async GetLeaderboardBirbFriends (db, {top}, {user, token}) {
+			check(user)
 			graph.setAccessToken(token)
 			try {
 				const result = await graph.getAsync('me/friends?fields=id')

@@ -1,10 +1,19 @@
+import check from '../../util/check'
+import populate from '@/util/populate'
+import graphqlMongodbProjection from 'graphql-mongodb-projection'
+
 exports.resolver = {
 	Query: {
-		async Achievements(db, params, {user}){
-			let achievements = await db.model('Achievement').find({game: user.game})
+		async Achievements(db, _, {user}, info){
+			check(user)
+			let userA = await populate('User', user, 'achievements')
+			let achievements = await db.model('Achievement').find({game: user.game}, graphqlMongodbProjection(info))
+			if (!userA.achievements) {
+				return achievements
+			}
 
-			user.achievements.map(completedAchievement => {
-				achievements.find(achievement => achievement._id.equals(completedAchievement._id)).completed = completedAchievement.completed.toUTCString()
+			userA.achievements.map(completedAchievement => {
+					achievements.find(achievement => achievement._id.equals(completedAchievement._id)).completed = completedAchievement.completed.toUTCString()
 			})
 
 			return achievements.sort((a, b) => {
@@ -20,7 +29,9 @@ exports.resolver = {
 	},
 	Mutation: {
 		async CompleteAchievement(db, {title}, {user}) {
-			const achievement = await db.model('Achievement').findOne({title: title, game: user.game}).select('_id')
+			check(user)
+			
+			const achievement = await db.model('Achievement').findOne({title: title, game: user.game}, {_id: 1})
 
 			if (!achievement) {
 				return new Error('Achievement not found')

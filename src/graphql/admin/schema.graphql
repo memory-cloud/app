@@ -35,7 +35,7 @@ type Query {
 }
 
 type Mutation {
-    createGame(game: GameInput!): Boolean
+    createGame(game: GameInput!): Game
     upsertAchievements(achievements: [AchievementInput!]!, appid: String!): [Achievement]
     deleteAchievement(appid: String!, achievementid: String!): Achievement
 }

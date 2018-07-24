@@ -1,6 +1,7 @@
 import AchievementModel from '@/models/achievement'
 import UserModel from '@/models/user'
 import graphqlMongodbProjection from 'graphql-mongodb-projection'
+import check from '@/util/check'
 
 exports.resolver = {
 	Game: {
@@ -14,45 +15,79 @@ exports.resolver = {
 	},
 	Query: {
 		me (db, args, {admin, dataloaders}, info) {
-			// return db.model('Admin').findOne({_id: admin}, graphqlMongodbProjection(info))
-			return dataloaders.userById.load(admin)
+			check(admin)
+			return db.model('Admin').findOne({_id: admin}, graphqlMongodbProjection(info))
+			// return dataloaders.userById.load(admin)
 		},
 		games (db, args, {admin}, info) {
+			check(admin)
 			return db.model('Game').find({admin: admin}, graphqlMongodbProjection(info))
 		},
 		game (db, {appid}, {admin}, info) {
+			check(admin)
 			return db.model('Game').findOne({admin: admin, appid: appid}, graphqlMongodbProjection(info))
 		},
 
 	},
 	Mutation: {
 		async createGame (db, {game}, {admin}) {
-			var re = /^[1-9][0-9]*$/
-			if (!re.test(game.appid)) {
-				return new Error(game.appid + ' is not a valid Facebook App ID')
-			}
-
-			if (await db.model('Game').findOne({appid: game.appid})) {
-				return new Error('Game already registered')
-			}
-
-			game.admin = admin._id
-
 			try {
-				await db.model('Game').create(game)
+				check(admin)
+				var re = /^[1-9][0-9]*$/
+				if (!re.test(game.appid)) {
+					throw new Error(game.appid + ' is not a valid Facebook App ID')
+				}
+
+				game.admin = admin._id
+
+				return await db.model('Game').create(game)
 			} catch (err) {
 				return err
 			}
 		},
-		async upsertAchievements(db, {achievements, appid}, {admin}) {
-			var game = await db.model('Game').FindGame(appid, admin)
-			return game.UpsertAchievements(achievements)
-		},
-		async deleteAchievement(db, {appid, achievementid}, {admin}) {
+		async upsertAchievements(db, {achievements, appid}, {admin}, info) {
 			try {
-				let game = await db.model('Game').FindGame(appid, admin)
+				check(admin)
+				var game = await db.model('Game').FindGame(appid, admin)
 
-				let achievement = await db.model('Achievement').findOneAndDelete({_id: achievementid, game: game})
+				let newAchievements = achievements.filter(achievement => !achievement._id)
+				let updateAchievements = achievements.filter(achievement => achievement._id)
+
+				if (updateAchievements[0]) { //updateMany
+					updateAchievements.map(async(achievement) => await db.model('Achievement').update({
+						_id: achievement._id,
+						game: game._id
+					}, achievement))
+				}
+
+				if (!newAchievements[0]) {
+					return db.model('Achievement').find({game: game}, graphqlMongodbProjection(info))
+				}
+				newAchievements.map(async(achievement) => {
+					achievement.game = game._id
+					achievement._id = mongoose.Types.ObjectId()
+					game.achievements.push(achievement._id)
+				})
+
+				await db.model('Achievement').insertMany(newAchievements)
+				await game.save()
+				return db.model('Achievement').find({game: game}, graphqlMongodbProjection(info))
+
+			} catch (err) {
+				return err
+			}
+		},
+		async deleteAchievement(db, {appid, achievementid}, {admin}, info) {
+			try {
+				check(admin)
+
+				let game = await db.model('Game').findOne({appid: appid, admin: admin}, {achievements: 1})
+
+				if (!game) {
+					throw new Error('Game not found')
+				}
+
+				let achievement = await db.model('Achievement').findOneAndDelete({_id: achievementid, game: game}, graphqlMongodbProjection(info))
 
 				if (!achievement) {
 					throw new Error('Achievement not found')

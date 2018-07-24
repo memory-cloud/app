@@ -3,14 +3,21 @@ type Score {
     id: String
 }
 
-type Leaderboard {
-    leaderboard: [Score]
+type Place {
     position: Int
     score: Int
 }
 
+type Leaderboard {
+    global: [Score]
+    meglobal: Place
+    friends: [Score]
+    mefriends: Place
+}
+
 type Query {
-    LeaderboardFriends(top: Int = 100, key: String!): Leaderboard
-    Leaderboard(top: Int = 100, key: String = "score"): Leaderboard
-    PublicLeaderboard(appid: String!, key: String!, top: Int = 100): [Score]
+    LeaderboardFriends(top: Int = 100, page: Int = 1, key: String!): [Score]
+    LeaderboardGlobal(top: Int = 100, page: Int = 1, key: String!): [Score]
+    LeaderboardMeFriends(key: String!): Place
+    LeaderboardMeGlobal(key: String!): Place
 }

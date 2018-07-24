@@ -73,7 +73,7 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.statics.FindOrCreate = async function (fbid, game) {
 	try {
-		let user = await this.findOne({fbid: fbid})
+		let user = await this.findOne({fbid: fbid}, {_id: 1})
 		if (!user) {
 			user = await this.create({fbid: fbid, game: game})
 		}
