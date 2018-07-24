@@ -24,8 +24,6 @@ function startDB () {
 }
 
 function debug () {
-	Mongoose.set('debug', true)
-
 	Mongoose.set('debug', function (coll, method, query, doc, options) {
 		let set = {
 			coll: coll,
