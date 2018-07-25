@@ -30,7 +30,7 @@ exports.resolver = {
 				await user.save()
 				return true
 			} catch (err) {
-				return false
+				return err
 			}
 		}
 	}
