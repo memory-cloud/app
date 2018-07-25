@@ -3,7 +3,11 @@ import mongoose from 'mongoose'
 const UserSchema = new mongoose.Schema({
 	fbid: {
 		type: String,
-		required: true,
+		index: true,
+		unique: true
+	},
+	gid: {
+		type: String,
 		index: true,
 		unique: true
 	},
@@ -76,6 +80,19 @@ UserSchema.statics.FindOrCreate = async function (fbid, game) {
 		let user = await this.findOne({fbid: fbid}, {_id: 1})
 		if (!user) {
 			user = await this.create({fbid: fbid, game: game})
+		}
+
+		return user
+	} catch (err) {
+		return err
+	}
+}
+
+UserSchema.statics.FindOrCreateGoogle = async function (gid, game) {
+	try {
+		let user = await this.findOne({gid: gid}, {_id: 1})
+		if (!user) {
+			user = await this.create({gid: gid, game: game})
 		}
 
 		return user

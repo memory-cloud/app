@@ -14,6 +14,15 @@ const GameSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	gappid: {
+		type: String,
+		unique: true
+		// required: true
+	},
+	gappkey: {
+		type: String
+		// required: true
+	},
 	admin: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Admin',
