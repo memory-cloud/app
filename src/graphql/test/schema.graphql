@@ -1,3 +1,3 @@
 type Query {
-    Test(idtoken: String!, clientid: String!, clientsecret: String!): String
+    Test(idtoken: String!, clientid: String!, clientsecret: String!, redirecturi: String!): String
 }
