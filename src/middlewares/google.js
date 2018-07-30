@@ -1,8 +1,10 @@
-import UserModel from '@/models/user'
+// @flow
+
 import Mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
+import { Request, Response, NextFunction } from 'express'
 
-module.exports = async (req, res, next) => {
+module.exports = async (req: Request, res: Response, next: NextFunction): NextFunction => {
 	const appId = req.headers.appid
 
 	if (!req.headers.authorization) return next()
@@ -21,15 +23,16 @@ module.exports = async (req, res, next) => {
 			let game = await Mongoose.model('Game').findOne({appid: appId}, {_id: 1})
 			let test = jwt.decode(credentials)
 			let useridg = test.sub
-			let user = await UserModel.FindOrCreateGoogle(useridg, game._id)
+			let user = await Mongoose.model('User').FindOrCreateGoogle(useridg, game._id)
 			user.game = game._id
 			user.gid = useridg
 			req.context.user = user
-			return next()
+			next()
 		} catch (err) {
 			console.log(err)
 			return res.sendStatus(500)
 		}
+		break
 	default:
 		next()
 	}

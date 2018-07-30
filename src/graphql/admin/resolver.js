@@ -1,15 +1,14 @@
-import AchievementModel from '@/models/achievement'
-import UserModel from '@/models/user'
 import graphqlMongodbProjection from 'graphql-mongodb-projection'
 import check from '@/util/check'
+import db from 'mongoose'
 
 exports.resolver = {
 	Game: {
 		achievements (game, params, context, info) {
-			return AchievementModel.find({game: game}, graphqlMongodbProjection(info))
+			return db.model('Achievement').find({game: game}, graphqlMongodbProjection(info))
 		},
 		players (game) {
-			return UserModel.find({game: game._id}).count()
+			return db.model('Game').find({game: game._id}).count()
 		}
 
 	},

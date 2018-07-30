@@ -1,5 +1,5 @@
 {
-  "name": "kit",
+  "name": "memorycloud",
   "version": "1.0.0",
   "description": "Starting point for GraphQL Server.",
   "main": "server.js",
@@ -17,11 +17,11 @@
     "google-auth-library": "^1.6.1",
     "graphql": "^0.11.7",
     "graphql-mongodb-projection": "^1.1.0",
-    "graphql-server-express": "^1.2.0",
-    "graphql-tools": "^1.2.3",
+    "graphql-server-express": "^1.4.0",
+    "graphql-tools": "^3.0.5",
     "jsonwebtoken": "^8.2.1",
     "mongoose": "^5.2.4",
-    "schemaglue": "^2.0.1"
+    "schemaglue": "^4.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -29,13 +29,17 @@
     "babel-plugin-root-import": "^5.1.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
+    "babel-preset-flow": "^6.23.0",
     "dotenv": "^4.0.0",
     "eslint": "^4.11.0",
     "eslint-config-standard": "^10.2.1",
+    "eslint-import-resolver-babel-plugin-root-import": "^1.1.1",
+    "eslint-plugin-flowtype": "^2.50.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
+    "flow-bin": "^0.77.0",
     "rimraf": "^2.6.2"
   },
   "scripts": {
@@ -43,12 +47,11 @@
     "start": "node src/index.js",
     "prebuild": "rimraf build/",
     "build": "babel . --ignore node_modules,dev.js,yarn -d build",
-    "heroku-prebuild": "npm install --only=dev && npm install && npm run build",
-    "heroku-postbuild": "npm prune --production && find src/ -maxdepth 6 -name \"*.js\" -type f -delete && cp -rfv build/src/ ./"
+    "flow": "flow"
   },
   "author": "Rafael Santos",
   "license": "MIT",
-  "repository": "https://github.com/rafaelnsantos/unity-cloudsave",
+  "repository": "https://github.com/memory-cloud/app",
   "engines": {
     "node": "8.9.4",
     "npm": "5.6.0"

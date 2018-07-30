@@ -1,4 +1,4 @@
-import check from '../../util/check'
+import check from '@/util/check'
 import populate from '@/util/populate'
 import graphqlMongodbProjection from 'graphql-mongodb-projection'
 

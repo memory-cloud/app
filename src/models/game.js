@@ -1,3 +1,5 @@
+// @flow
+
 import mongoose from 'mongoose'
 
 const GameSchema = new mongoose.Schema({
@@ -38,7 +40,7 @@ const GameSchema = new mongoose.Schema({
 	timestamps: true
 })
 
-GameSchema.statics.FindGame = async function (appid, admin) {
+GameSchema.statics.FindGame = async function (appid: string, admin: any): any {
 	const game = await mongoose.model('Game').findOne({appid: appid, admin: admin})
 
 	if (!game) {

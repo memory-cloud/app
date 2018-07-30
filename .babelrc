@@ -1,5 +1,5 @@
 {
-  "presets": ["env"],
+  "presets": ["env", "flow"],
   "plugins": [
     ["babel-plugin-root-import", {
       "rootPathSuffix": "src",

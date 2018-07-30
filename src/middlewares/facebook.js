@@ -1,9 +1,17 @@
-import UserModel from '@/models/user'
+// @flow
+
 import graph from 'fbgraph'
 import dataloaders from '@/dataloader'
 import Mongoose from 'mongoose'
+import { Request, Response, NextFunction } from 'express'
 
-module.exports = async (req, res, next) => {
+type ResultType = {
+	data: {
+		user_id: string
+	}
+};
+
+module.exports = async (req: Request, res: Response, next: NextFunction): NextFunction => {
 	const appId = req.headers.appid
 
 	if (!req.headers.authorization) return next()
@@ -22,24 +30,24 @@ module.exports = async (req, res, next) => {
 
 		if (!game) res.sendStatus(500)
 
-		graph.get('debug_token?input_token=' + credentials + '&access_token=' + appId + '|' + game.key, async (err, result) => {
+		graph.get('debug_token?input_token=' + credentials + '&access_token=' + appId + '|' + game.key, async (err: any, result: ResultType): Promise<any> => {
 			if (err) return res.sendStatus(500)
 			const userId = result.data.user_id
 			try {
-				const user = await UserModel.FindOrCreate(userId, game._id)
+				const user = await Mongoose.model('User').FindOrCreate(userId, game._id)
 				if (!user) return res.sendStatus(500)
 				user.game = game._id
 				user.fbid = userId
 				req.context.user = user
 				req.context.token = credentials
 				req.context.dataloaders = dataloaders(Mongoose)
-				return next()
+				next()
 			} catch (err) {
 				console.log(err)
 				return res.sendStatus(500)
 			}
 		})
-	break
+		break
 	default:
 		next()
 	}

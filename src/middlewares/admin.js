@@ -1,8 +1,10 @@
-import AdminModel from '@/models/admin'
+// @flow
+
 import dataloaders from '@/dataloader'
 import Mongoose from 'mongoose'
+import { Request, Response, NextFunction } from 'express'
 
-module.exports = async (req, res, next) => {
+module.exports = async (req: Request, res: Response, next: NextFunction): NextFunction => {
 	if (!req.headers.authorization) return next()
 
 	const parts = req.headers.authorization.split(' ')
@@ -14,14 +16,14 @@ module.exports = async (req, res, next) => {
 	switch (scheme) {
 	case 'admin':
 		try {
-			req.context.admin = await AdminModel.findByToken(credentials)
+			req.context.admin = await Mongoose.model('Admin').findByToken(credentials)
 			req.context.dataloaders = dataloaders(Mongoose)
-			return next()
+			next()
 		} catch (err) {
 			console.log(err)
 			return res.sendStatus(500)
 		}
-	break
+		break
 	default:
 		next()
 	}

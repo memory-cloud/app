@@ -1,4 +1,18 @@
+// @flow
+
 import mongoose from 'mongoose'
+
+export type UserType = {
+    _id: string,
+    fbid: string,
+    gid: string,
+    game: any,
+    integers: [],
+    floats: [],
+    strings: [],
+    booleans: [],
+    achievements: []
+};
 
 const UserSchema = new mongoose.Schema({
 	fbid: {
@@ -75,7 +89,7 @@ const UserSchema = new mongoose.Schema({
 	timestamps: true
 })
 
-UserSchema.statics.FindOrCreate = async function (fbid, game) {
+UserSchema.statics.FindOrCreate = async function (fbid: string, game: any): Promise<UserType> {
 	try {
 		let user = await this.findOne({fbid: fbid}, {_id: 1})
 		if (!user) {
@@ -88,7 +102,7 @@ UserSchema.statics.FindOrCreate = async function (fbid, game) {
 	}
 }
 
-UserSchema.statics.FindOrCreateGoogle = async function (gid, game) {
+UserSchema.statics.FindOrCreateGoogle = async function (gid: string, game: any): Promise<UserType> {
 	try {
 		let user = await this.findOne({gid: gid}, {_id: 1})
 		if (!user) {
@@ -101,7 +115,7 @@ UserSchema.statics.FindOrCreateGoogle = async function (gid, game) {
 	}
 }
 
-UserSchema.methods.UpsertString = async function (key, value) {
+UserSchema.methods.UpsertString = async function (key: string, value: string): Promise<void> {
 	try {
 		this.strings.id(key).value = value
 	} catch (err) {
@@ -109,7 +123,7 @@ UserSchema.methods.UpsertString = async function (key, value) {
 	}
 }
 
-UserSchema.methods.UpsertInt = async function (key, value) {
+UserSchema.methods.UpsertInt = async function (key: string, value: number): Promise<void> {
 	try {
 		this.integers.id(key).value = value
 	} catch (err) {
@@ -117,7 +131,7 @@ UserSchema.methods.UpsertInt = async function (key, value) {
 	}
 }
 
-UserSchema.methods.UpsertBool = async function (key, value) {
+UserSchema.methods.UpsertBool = async function (key: string, value: boolean): Promise<void> {
 	try {
 		this.booleans.id(key).value = value
 	} catch (err) {
@@ -125,7 +139,7 @@ UserSchema.methods.UpsertBool = async function (key, value) {
 	}
 }
 
-UserSchema.methods.UpsertFloat = async function (key, value) {
+UserSchema.methods.UpsertFloat = async function (key: string, value: number): Promise<void> {
 	try {
 		this.floats.id(key).value = value
 	} catch (err) {
